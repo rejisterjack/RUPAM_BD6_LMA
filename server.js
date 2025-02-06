@@ -165,14 +165,14 @@ app.get("/packages", (req, res) => {
 // Exercise 2: Retrieve Travel Package by Destination (GET)
 app.get("/packages/:destination", (req, res) => {
   const destination = req.params.destination
-  const package = travelPackages.find((pkg) => pkg.destination === destination)
+  const currentPackage = travelPackages.find((pkg) => pkg.destination === destination)
 
-  if (!package) {
+  if (!currentPackage) {
     res.status(404).json({ error: "Package not found" })
     return
   }
 
-  res.status(200).json({ package })
+  res.status(200).json({ package:currentPackage })
 })
 
 // Exercise 3: Add a New Booking  (POST)
@@ -203,18 +203,20 @@ app.post("/bookings", validateBooking, addBooking)
 // Exercise 4: Update Available Slots for a Package(POST)
 app.post("/packages/update-seats", (req, res) => {
   const { packageId, seatsBooked } = req.body
-  const package = travelPackages.find((pkg) => pkg.packageId === packageId)
+  const currentPackage = travelPackages.find(
+    (pkg) => pkg.packageId === packageId
+  )
 
-  if (!package) {
+  if (!currentPackage) {
     res.status(404).json({ error: "Package not found" })
     return
   }
 
-  package.availableSlots -= seatsBooked
+  currentPackage.availableSlots -= seatsBooked
   travelPackages = travelPackages.map((pkg) =>
-    pkg.packageId === packageId ? package : pkg
+    pkg.packageId === packageId ? currentPackage : pkg
   )
-  res.status(200).json({ package })
+  res.status(200).json({ package: currentPackage })
 })
 
 // Exercise 5: Retrieve All Bookings for a Package (GET)
@@ -237,4 +239,6 @@ module.exports = {
   port,
   travelPackages,
   bookings,
+  validateBooking,
+  addBooking
 }
